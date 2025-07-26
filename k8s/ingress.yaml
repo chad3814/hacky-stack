@@ -1,0 +1,92 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hackystack-ingress
+  labels:
+    app: hackystack
+  annotations:
+    # Enable HTTPS redirect
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    
+    # Enable HSTS
+    nginx.ingress.kubernetes.io/server-snippet: |
+      add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    
+    # Rate limiting
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    
+    # Request size limits
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    
+    # Health check configuration
+    nginx.ingress.kubernetes.io/health-check-path: "/api/health"
+    nginx.ingress.kubernetes.io/health-check-interval: "30s"
+    nginx.ingress.kubernetes.io/health-check-timeout: "5s"
+    
+    # Enable gzip compression
+    nginx.ingress.kubernetes.io/enable-gzip: "true"
+    
+    # Session affinity for better performance
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "hackystack-server"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "86400"
+    nginx.ingress.kubernetes.io/session-cookie-path: "/"
+    
+    # Cert manager for automatic SSL certificates
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - your-domain.com
+    - www.your-domain.com
+    secretName: hackystack-tls
+  rules:
+  - host: your-domain.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: hackystack-service
+            port:
+              number: 80
+  - host: www.your-domain.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: hackystack-service
+            port:
+              number: 80
+
+---
+# Optional: Ingress for health checks (can be accessed without authentication)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hackystack-health-ingress
+  labels:
+    app: hackystack
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    # Allow access to health endpoints without authentication
+    nginx.ingress.kubernetes.io/auth-type: ""
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: your-domain.com
+    http:
+      paths:
+      - path: /health(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: hackystack-service
+            port:
+              number: 80

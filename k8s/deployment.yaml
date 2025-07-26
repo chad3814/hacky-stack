@@ -1,0 +1,129 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hackystack
+  labels:
+    app: hackystack
+    version: v1
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: hackystack
+  template:
+    metadata:
+      labels:
+        app: hackystack
+        version: v1
+    spec:
+      containers:
+      - name: hackystack
+        image: hackystack:latest
+        ports:
+        - containerPort: 3000
+          name: http
+          protocol: TCP
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "3000"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: hackystack-secrets
+              key: database-url
+        - name: NEXTAUTH_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: hackystack-secrets
+              key: nextauth-secret
+        - name: NEXTAUTH_URL
+          valueFrom:
+            configMapKeyRef:
+              name: hackystack-config
+              key: nextauth-url
+        - name: GITHUB_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: hackystack-secrets
+              key: github-client-id
+        - name: GITHUB_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: hackystack-secrets
+              key: github-client-secret
+        
+        # Resource limits and requests
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        
+        # Startup probe - gives the app time to start up
+        startupProbe:
+          httpGet:
+            path: /api/health/live
+            port: 3000
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 30  # Allow up to 5 minutes for startup
+        
+        # Liveness probe - restart container if this fails
+        livenessProbe:
+          httpGet:
+            path: /api/health/live
+            port: 3000
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+          successThreshold: 1
+          failureThreshold: 3
+        
+        # Readiness probe - remove from service if this fails
+        readinessProbe:
+          httpGet:
+            path: /api/health/ready
+            port: 3000
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+        
+        # Security context
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          runAsGroup: 1000
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop:
+            - ALL
+      
+      # Pod security context
+      securityContext:
+        fsGroup: 1000
+      
+      # Service account
+      serviceAccountName: hackystack
+      
+      # Image pull policy
+      imagePullPolicy: IfNotPresent
+      
+      # Termination grace period
+      terminationGracePeriodSeconds: 30

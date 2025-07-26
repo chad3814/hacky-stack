@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hackystack-config
+  labels:
+    app: hackystack
+data:
+  # NextAuth URL - update this for your domain
+  nextauth-url: "https://your-domain.com"
+  
+  # Node.js configuration
+  node-env: "production"
+  
+  # Application configuration
+  port: "3000"
+  
+  # Health check endpoints
+  health-check-path: "/api/health"
+  liveness-check-path: "/api/health/live"
+  readiness-check-path: "/api/health/ready"
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: hackystack
+  labels:
+    app: hackystack
+automountServiceAccountToken: false

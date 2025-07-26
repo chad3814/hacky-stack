@@ -1,0 +1,23 @@
+{
+  "name": "HackyStack - Environment & Deployment Management",
+  "short_name": "HackyStack",
+  "description": "Manage your applications' environments and deployments to Kubernetes on AWS EC2 instances",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ]
+}

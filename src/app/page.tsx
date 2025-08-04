@@ -9,10 +9,13 @@ import SkeletonCard from "@/components/skeleton-card";
 import EmptyState from "@/components/empty-state";
 import CreateApplicationModal from "@/components/create-application-modal";
 import DeleteConfirmationModal from "@/components/delete-confirmation-modal";
+import ErrorBoundary from "@/components/error-boundary";
 import Button from "@/components/ui/button";
+import { useToast } from "@/components/ui/toast";
 
 export default function Home() {
   const { data: session, status } = useSession();
+  const { showToast } = useToast();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [deleteApplication, setDeleteApplication] = useState<{ id: string; name: string } | null>(null);
   
@@ -42,7 +45,21 @@ export default function Home() {
   }, [loadMore]);
 
   const handleCreateApplication = async (data: { name: string; description?: string }) => {
-    await createApplication(data);
+    try {
+      await createApplication(data);
+      showToast({
+        type: 'success',
+        title: 'Application created',
+        message: `${data.name} has been created successfully.`
+      });
+    } catch (error) {
+      showToast({
+        type: 'error',
+        title: 'Failed to create application',
+        message: error instanceof Error ? error.message : 'An unexpected error occurred.'
+      });
+      throw error; // Re-throw so the modal can handle it
+    }
   };
 
   const handleDeleteApplication = async (id: string) => {
@@ -54,7 +71,21 @@ export default function Home() {
 
   const confirmDelete = async () => {
     if (deleteApplication) {
-      await deleteApp(deleteApplication.id);
+      try {
+        await deleteApp(deleteApplication.id);
+        showToast({
+          type: 'success',
+          title: 'Application deleted',
+          message: `${deleteApplication.name} has been deleted successfully.`
+        });
+      } catch (error) {
+        showToast({
+          type: 'error',
+          title: 'Failed to delete application',
+          message: error instanceof Error ? error.message : 'An unexpected error occurred.'
+        });
+        throw error; // Re-throw so the modal can handle it
+      }
     }
   };
   
@@ -191,7 +222,7 @@ export default function Home() {
         <EmptyState onCreateClick={() => setShowCreateModal(true)} />
       ) : (
         /* Applications Grid */
-        <>
+        <ErrorBoundary>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {applications.map((application) => (
               <ApplicationCard
@@ -217,7 +248,7 @@ export default function Home() {
               </p>
             </div>
           )}
-        </>
+        </ErrorBoundary>
       )}
 
       {/* Create Application Modal */}

@@ -33,7 +33,7 @@ export function useApplications(options: UseApplicationsOptions = {}): UseApplic
     isHealthy: Math.random() > 0.3 // Mock 70% healthy rate
   })
 
-  const fetchApplications = useCallback(async (pageNum: number, reset = false) => {
+  const fetchApplications = useCallback(async (pageNum: number, reset = false, retryCount = 0) => {
     try {
       if (pageNum === 1) setLoading(true)
       else setLoadingMore(true)
@@ -41,7 +41,14 @@ export function useApplications(options: UseApplicationsOptions = {}): UseApplic
       const response = await fetch(`/api/applications?page=${pageNum}&limit=${pageSize}`)
       
       if (!response.ok) {
-        throw new Error('Failed to fetch applications')
+        if (response.status >= 500 && retryCount < 2) {
+          // Retry server errors up to 2 times
+          setTimeout(() => {
+            fetchApplications(pageNum, reset, retryCount + 1)
+          }, 1000 * (retryCount + 1)) // Exponential backoff
+          return
+        }
+        throw new Error(`Failed to fetch applications (${response.status})`)
       }
 
       const data = await response.json()
@@ -56,6 +63,13 @@ export function useApplications(options: UseApplicationsOptions = {}): UseApplic
       setHasMore(data.applications.length === pageSize)
       setError(null)
     } catch (err) {
+      if (retryCount < 2 && (err instanceof TypeError || (err instanceof Error && err.message.includes('fetch')))) {
+        // Retry network errors
+        setTimeout(() => {
+          fetchApplications(pageNum, reset, retryCount + 1)
+        }, 1000 * (retryCount + 1))
+        return
+      }
       setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
       setLoading(false)

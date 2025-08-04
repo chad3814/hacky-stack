@@ -1,6 +1,6 @@
 'use client'
 
-import { TextareaHTMLAttributes, forwardRef, useEffect, useRef } from 'react'
+import { TextareaHTMLAttributes, forwardRef, useEffect, useRef, useCallback } from 'react'
 
 interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string
@@ -23,16 +23,16 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       }
     }
 
-    const adjustHeight = () => {
+    const adjustHeight = useCallback(() => {
       if (autoResize && textareaRef.current) {
         textareaRef.current.style.height = 'auto'
         textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`
       }
-    }
+    }, [autoResize])
 
     useEffect(() => {
       adjustHeight()
-    }, [props.value])
+    }, [props.value, adjustHeight])
 
     const textareaClasses = `
       w-full px-3 py-2 border rounded-md shadow-sm transition-colors resize-none

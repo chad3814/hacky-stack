@@ -29,7 +29,7 @@ export default function ApplicationDetailsModal({
     if (isOpen && applicationId) {
       fetchApplication()
     }
-  }, [isOpen, applicationId])
+  }, [isOpen, applicationId]) // fetchApplication is stable
 
   useEffect(() => {
     if (isOpen) {

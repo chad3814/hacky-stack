@@ -1,0 +1,47 @@
+# Services for PostgreSQL StatefulSet
+# Two services: headless service for StatefulSet and regular service for applications
+
+# Headless service for the StatefulSet
+# This is required for StatefulSet to provide stable network identities
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresql-headless
+  namespace: hackystack
+  labels:
+    app: postgresql
+    component: headless-service
+spec:
+  # ClusterIP: None makes this a headless service
+  clusterIP: None
+  ports:
+  - port: 5432
+    targetPort: 5432
+    protocol: TCP
+    name: postgresql
+  selector:
+    app: postgresql
+    component: database
+
+---
+# Regular ClusterIP service for application connectivity
+# Applications will connect to PostgreSQL through this service
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresql-service
+  namespace: hackystack
+  labels:
+    app: postgresql
+    component: service
+spec:
+  # ClusterIP service provides a stable internal IP
+  type: ClusterIP
+  ports:
+  - port: 5432
+    targetPort: 5432
+    protocol: TCP
+    name: postgresql
+  selector:
+    app: postgresql
+    component: database

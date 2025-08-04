@@ -1,0 +1,49 @@
+# PersistentVolume for PostgreSQL data storage
+# This creates a local storage volume on the Minikube node
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgresql-pv
+  labels:
+    app: postgresql
+    component: storage
+spec:
+  capacity:
+    storage: 10Gi
+  # ReadWriteOnce means the volume can be mounted as read-write by a single node
+  accessModes:
+    - ReadWriteOnce
+  # Retain policy keeps the data even after PVC is deleted
+  persistentVolumeReclaimPolicy: Retain
+  # Local storage class for Minikube
+  storageClassName: local-storage
+  # Local path on the Minikube node
+  local:
+    path: /mnt/data/postgresql
+  # Node affinity ensures the volume is only available on the Minikube node
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - minikube
+
+---
+# StorageClass for local storage
+# This defines how PersistentVolumeClaims should be provisioned
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-storage
+  labels:
+    app: postgresql
+    component: storage
+# No provisioner for local storage - volumes must be created manually
+provisioner: kubernetes.io/no-provisioner
+# WaitForFirstConsumer means the volume binding and provisioning 
+# will wait until a pod using the PVC is created
+volumeBindingMode: WaitForFirstConsumer
+# Allow volume expansion
+allowVolumeExpansion: true

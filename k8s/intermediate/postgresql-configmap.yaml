@@ -1,0 +1,80 @@
+# ConfigMap for PostgreSQL configuration
+# This stores non-sensitive PostgreSQL configuration and initialization scripts
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgresql-config
+  namespace: hackystack
+  labels:
+    app: postgresql
+    component: config
+data:
+  # PostgreSQL configuration parameters
+  postgresql.conf: |
+    # Basic PostgreSQL configuration optimized for development
+    listen_addresses = '*'
+    port = 5432
+    max_connections = 100
+    shared_buffers = 128MB
+    effective_cache_size = 256MB
+    maintenance_work_mem = 32MB
+    checkpoint_completion_target = 0.9
+    wal_buffers = 16MB
+    default_statistics_target = 100
+    random_page_cost = 4
+    effective_io_concurrency = 2
+    work_mem = 4MB
+    min_wal_size = 1GB
+    max_wal_size = 4GB
+    
+    # Logging configuration
+    log_destination = 'stderr'
+    logging_collector = off
+    log_min_messages = warning
+    log_min_error_statement = error
+    log_statement = 'none'
+    
+    # Development-friendly settings
+    log_line_prefix = '%t [%p]: [%l-1] user=%u,db=%d,app=%a,client=%h '
+    
+  # Host-based authentication
+  pg_hba.conf: |
+    # TYPE  DATABASE        USER            ADDRESS                 METHOD
+    local   all             all                                     trust
+    host    all             all             127.0.0.1/32            md5
+    host    all             all             ::1/128                 md5
+    host    all             all             0.0.0.0/0               md5
+    
+  # Database initialization script
+  init-hackystack-db.sql: |
+    -- Create the hackystack database if it doesn't exist
+    SELECT 'CREATE DATABASE hackystack'
+    WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'hackystack')\gexec
+    
+    -- Create the hackystack user if it doesn't exist
+    DO
+    $do$
+    BEGIN
+       IF NOT EXISTS (
+          SELECT FROM pg_catalog.pg_roles
+          WHERE  rolname = 'hackystack') THEN
+          
+          CREATE ROLE hackystack LOGIN PASSWORD 'hackystack_password';
+       END IF;
+    END
+    $do$;
+    
+    -- Grant privileges
+    GRANT ALL PRIVILEGES ON DATABASE hackystack TO hackystack;
+    
+    -- Connect to hackystack database and set up schema
+    \c hackystack;
+    
+    -- Grant schema privileges
+    GRANT ALL ON SCHEMA public TO hackystack;
+    GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO hackystack;
+    GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO hackystack;
+    
+    -- Set default privileges for future objects
+    ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO hackystack;
+    ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO hackystack;

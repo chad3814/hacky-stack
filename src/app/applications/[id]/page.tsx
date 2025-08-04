@@ -6,15 +6,22 @@ import { useSession } from 'next-auth/react'
 import ApplicationDetailsModal from '@/components/application-details-modal'
 
 interface ApplicationDetailsPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default function ApplicationDetailsPage({ params }: ApplicationDetailsPageProps) {
   const router = useRouter()
   const { data: session, status } = useSession()
   const [isOpen, setIsOpen] = useState(false)
+  const [applicationId, setApplicationId] = useState<string | null>(null)
+
+  useEffect(() => {
+    params.then(resolvedParams => {
+      setApplicationId(resolvedParams.id)
+    })
+  }, [params])
 
   useEffect(() => {
     if (status === 'loading') return
@@ -62,11 +69,13 @@ export default function ApplicationDetailsPage({ params }: ApplicationDetailsPag
       </main>
 
       {/* Modal overlay */}
-      <ApplicationDetailsModal
-        applicationId={params.id}
-        isOpen={isOpen}
-        onClose={handleClose}
-      />
+      {applicationId && (
+        <ApplicationDetailsModal
+          applicationId={applicationId}
+          isOpen={isOpen}
+          onClose={handleClose}
+        />
+      )}
     </>
   )
 }

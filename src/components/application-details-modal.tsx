@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Application } from '@/types/application'
 import { useApplications } from '@/hooks/use-applications'
@@ -25,25 +25,7 @@ export default function ApplicationDetailsModal({
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (isOpen && applicationId) {
-      fetchApplication()
-    }
-  }, [isOpen, applicationId]) // fetchApplication is stable
-
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = 'unset'
-    }
-
-    return () => {
-      document.body.style.overflow = 'unset'
-    }
-  }, [isOpen])
-
-  const fetchApplication = async () => {
+  const fetchApplication = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -60,7 +42,25 @@ export default function ApplicationDetailsModal({
     } finally {
       setLoading(false)
     }
-  }
+  }, [applicationId])
+
+  useEffect(() => {
+    if (isOpen && applicationId) {
+      fetchApplication()
+    }
+  }, [isOpen, applicationId, fetchApplication])
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [isOpen])
 
   const handleUpdateName = async (newName: string) => {
     if (!application) return

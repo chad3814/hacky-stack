@@ -8,32 +8,32 @@ metadata:
     # Enable HTTPS redirect
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-    
+
     # Enable HSTS
     nginx.ingress.kubernetes.io/server-snippet: |
       add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
-    
+
     # Rate limiting
     nginx.ingress.kubernetes.io/rate-limit: "100"
     nginx.ingress.kubernetes.io/rate-limit-window: "1m"
-    
+
     # Request size limits
     nginx.ingress.kubernetes.io/proxy-body-size: "10m"
-    
+
     # Health check configuration
     nginx.ingress.kubernetes.io/health-check-path: "/api/health"
     nginx.ingress.kubernetes.io/health-check-interval: "30s"
     nginx.ingress.kubernetes.io/health-check-timeout: "5s"
-    
+
     # Enable gzip compression
     nginx.ingress.kubernetes.io/enable-gzip: "true"
-    
+
     # Session affinity for better performance
     nginx.ingress.kubernetes.io/affinity: "cookie"
     nginx.ingress.kubernetes.io/session-cookie-name: "hackystack-server"
     nginx.ingress.kubernetes.io/session-cookie-expires: "86400"
     nginx.ingress.kubernetes.io/session-cookie-path: "/"
-    
+
     # Cert manager for automatic SSL certificates
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:

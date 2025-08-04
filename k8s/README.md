@@ -16,16 +16,19 @@ This directory contains Kubernetes manifests for deploying HackyStack to a Kuber
 HackyStack provides three health check endpoints:
 
 ### `/api/health` - General Health Check
+
 - Comprehensive health status including database connectivity
 - Returns detailed information about all system components
 - Use for: General monitoring and debugging
 
 ### `/api/health/live` - Liveness Probe
+
 - Lightweight check to verify the application is running
 - Only checks basic application responsiveness
 - Use for: Kubernetes liveness probes, container restart decisions
 
 ### `/api/health/ready` - Readiness Probe
+
 - Checks if application is ready to serve traffic
 - Verifies database connectivity and required environment variables
 - Use for: Kubernetes readiness probes, load balancer health checks
@@ -90,6 +93,7 @@ kubectl logs -l app=hackystack --tail=100
 The deployment includes three types of probes:
 
 #### Startup Probe
+
 ```yaml
 startupProbe:
   httpGet:
@@ -101,6 +105,7 @@ startupProbe:
 ```
 
 #### Liveness Probe
+
 ```yaml
 livenessProbe:
   httpGet:
@@ -112,6 +117,7 @@ livenessProbe:
 ```
 
 #### Readiness Probe
+
 ```yaml
 readinessProbe:
   httpGet:
@@ -173,7 +179,7 @@ groups:
       severity: critical
     annotations:
       summary: "HackyStack is down"
-      
+
   - alert: HackyStackUnhealthy
     expr: probe_success{job="hackystack-health"} == 0
     for: 2m
@@ -239,21 +245,24 @@ resources:
 ### Common Issues
 
 1. **Health Check Failures**
+
    ```bash
    # Check pod logs
    kubectl logs <pod-name> --previous
-   
+
    # Check events
    kubectl describe pod <pod-name>
    ```
 
 2. **Database Connection Issues**
+
    ```bash
    # Verify database connectivity
    kubectl exec -it <pod-name> -- curl -v http://localhost:3000/api/health
    ```
 
 3. **Ingress Issues**
+
    ```bash
    # Check ingress controller logs
    kubectl logs -n ingress-nginx deployment/ingress-nginx-controller

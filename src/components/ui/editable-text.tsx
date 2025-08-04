@@ -93,7 +93,7 @@ export default function EditableText({
     return (
       <div className="space-y-1">
         <InputComponent
-          ref={inputRef as any}
+          ref={inputRef as React.RefObject<HTMLInputElement & HTMLTextAreaElement>}
           value={editValue}
           onChange={(e) => setEditValue(e.target.value)}
           onKeyDown={handleKeyDown}

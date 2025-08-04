@@ -7,13 +7,13 @@ metadata:
 data:
   # NextAuth URL - update this for your domain
   nextauth-url: "https://your-domain.com"
-  
+
   # Node.js configuration
   node-env: "production"
-  
+
   # Application configuration
   port: "3000"
-  
+
   # Health check endpoints
   health-check-path: "/api/health"
   liveness-check-path: "/api/health/live"

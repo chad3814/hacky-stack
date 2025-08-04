@@ -8,12 +8,13 @@ import ApplicationCard from "@/components/application-card";
 import SkeletonCard from "@/components/skeleton-card";
 import EmptyState from "@/components/empty-state";
 import CreateApplicationModal from "@/components/create-application-modal";
+import DeleteConfirmationModal from "@/components/delete-confirmation-modal";
 import Button from "@/components/ui/button";
 
 export default function Home() {
   const { data: session, status } = useSession();
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
+  const [deleteApplication, setDeleteApplication] = useState<{ id: string; name: string } | null>(null);
   
   const {
     applications,
@@ -22,7 +23,7 @@ export default function Home() {
     hasMore,
     loadMore,
     createApplication,
-    deleteApplication,
+    deleteApplication: deleteApp,
   } = useApplications();
 
   // Infinite scroll effect
@@ -45,13 +46,15 @@ export default function Home() {
   };
 
   const handleDeleteApplication = async (id: string) => {
-    setShowDeleteConfirm(id);
+    const app = applications.find(a => a.id === id);
+    if (app) {
+      setDeleteApplication({ id, name: app.name });
+    }
   };
 
   const confirmDelete = async () => {
-    if (showDeleteConfirm) {
-      await deleteApplication(showDeleteConfirm);
-      setShowDeleteConfirm(null);
+    if (deleteApplication) {
+      await deleteApp(deleteApplication.id);
     }
   };
   
@@ -225,33 +228,14 @@ export default function Home() {
       />
 
       {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setShowDeleteConfirm(null)} />
-          <div className="relative bg-white dark:bg-slate-800 rounded-lg p-6 max-w-md mx-4 shadow-xl">
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
-              Delete Application
-            </h3>
-            <p className="text-slate-600 dark:text-slate-400 mb-6">
-              Are you sure you want to delete this application? This action cannot be undone.
-            </p>
-            <div className="flex justify-end space-x-3">
-              <Button
-                variant="secondary"
-                onClick={() => setShowDeleteConfirm(null)}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="danger"
-                onClick={confirmDelete}
-              >
-                Delete
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DeleteConfirmationModal
+        isOpen={!!deleteApplication}
+        onClose={() => setDeleteApplication(null)}
+        onConfirm={confirmDelete}
+        title="Delete Application"
+        itemName={deleteApplication?.name}
+        confirmText="Delete Application"
+      />
     </main>
   );
 }

@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ApplicationWithHealth } from '@/types/application'
+import ContextMenu from './ui/context-menu'
 
 interface ApplicationCardProps {
   application: ApplicationWithHealth
@@ -11,21 +11,13 @@ interface ApplicationCardProps {
 
 export default function ApplicationCard({ application, onDelete }: ApplicationCardProps) {
   const router = useRouter()
-  const [showContextMenu, setShowContextMenu] = useState(false)
 
   const handleCardClick = (e: React.MouseEvent) => {
     e.preventDefault()
     router.push(`/applications/${application.id}`)
   }
 
-  const handleContextMenuClick = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    setShowContextMenu(!showContextMenu)
-  }
-
-  const handleDelete = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    setShowContextMenu(false)
+  const handleDelete = () => {
     onDelete?.(application.id)
   }
 
@@ -53,15 +45,22 @@ export default function ApplicationCard({ application, onDelete }: ApplicationCa
             </h3>
           </div>
           
-          {/* Context menu button */}
-          <button
-            onClick={handleContextMenuClick}
-            className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700 transition-opacity"
+          {/* Context menu */}
+          <ContextMenu
+            items={[
+              {
+                label: 'Delete',
+                onClick: handleDelete,
+                variant: 'danger'
+              }
+            ]}
           >
-            <svg className="w-4 h-4 text-slate-500" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-            </svg>
-          </button>
+            <button className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700 transition-opacity">
+              <svg className="w-4 h-4 text-slate-500" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+              </svg>
+            </button>
+          </ContextMenu>
         </div>
 
         {/* Description */}
@@ -75,23 +74,6 @@ export default function ApplicationCard({ application, onDelete }: ApplicationCa
         </div>
       </div>
 
-      {/* Context Menu */}
-      {showContextMenu && (
-        <>
-          <div
-            className="fixed inset-0 z-10"
-            onClick={() => setShowContextMenu(false)}
-          />
-          <div className="absolute top-2 right-2 z-20 bg-white dark:bg-slate-700 rounded-md shadow-lg border border-slate-200 dark:border-slate-600 py-1 min-w-[120px]">
-            <button
-              onClick={handleDelete}
-              className="w-full px-3 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-            >
-              Delete
-            </button>
-          </div>
-        </>
-      )}
     </div>
   )
 }

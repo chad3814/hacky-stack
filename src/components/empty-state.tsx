@@ -1,4 +1,4 @@
-import Button from './ui/button'
+import Button from './ui/button';
 
 interface EmptyStateProps {
   onCreateClick: () => void
@@ -34,5 +34,5 @@ export default function EmptyState({ onCreateClick }: EmptyStateProps) {
         Create New Application
       </Button>
     </div>
-  )
+  );
 }

@@ -1,26 +1,26 @@
-'use client'
+'use client';
 
-import { signIn, getSession } from 'next-auth/react'
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Image from 'next/image'
+import { signIn, getSession } from 'next-auth/react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function SignIn() {
-  const [loading, setLoading] = useState(false)
-  const router = useRouter()
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     getSession().then((session) => {
       if (session) {
-        router.push('/')
+        router.push('/');
       }
-    })
-  }, [router])
+    });
+  }, [router]);
 
   const handleSignIn = async () => {
-    setLoading(true)
-    await signIn('github', { callbackUrl: '/' })
-  }
+    setLoading(true);
+    await signIn('github', { callbackUrl: '/' });
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 py-12 px-4 sm:px-6 lg:px-8">
@@ -60,5 +60,5 @@ export default function SignIn() {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 interface Toast {
   id: string
@@ -16,46 +16,46 @@ interface ToastContextType {
   toasts: Toast[]
 }
 
-const ToastContext = createContext<ToastContextType | undefined>(undefined)
+const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 export function ToastProvider({ children }: { children: ReactNode }) {
-  const [toasts, setToasts] = useState<Toast[]>([])
+  const [toasts, setToasts] = useState<Toast[]>([]);
 
   const showToast = (toast: Omit<Toast, 'id'>) => {
-    const id = Math.random().toString(36).substr(2, 9)
-    const newToast = { ...toast, id }
+    const id = Math.random().toString(36).substr(2, 9);
+    const newToast = { ...toast, id };
     
-    setToasts(prev => [...prev, newToast])
+    setToasts(prev => [...prev, newToast]);
 
     // Auto remove after duration
-    const duration = toast.duration || 5000
+    const duration = toast.duration || 5000;
     setTimeout(() => {
-      removeToast(id)
-    }, duration)
-  }
+      removeToast(id);
+    }, duration);
+  };
 
   const removeToast = (id: string) => {
-    setToasts(prev => prev.filter(toast => toast.id !== id))
-  }
+    setToasts(prev => prev.filter(toast => toast.id !== id));
+  };
 
   return (
     <ToastContext.Provider value={{ showToast, removeToast, toasts }}>
       {children}
       <ToastContainer toasts={toasts} onRemove={removeToast} />
     </ToastContext.Provider>
-  )
+  );
 }
 
 export function useToast() {
-  const context = useContext(ToastContext)
+  const context = useContext(ToastContext);
   if (context === undefined) {
-    throw new Error('useToast must be used within a ToastProvider')
+    throw new Error('useToast must be used within a ToastProvider');
   }
-  return context
+  return context;
 }
 
 function ToastContainer({ toasts, onRemove }: { toasts: Toast[]; onRemove: (id: string) => void }) {
-  if (toasts.length === 0) return null
+  if (toasts.length === 0) return null;
 
   return (
     <div className="fixed top-4 right-4 z-50 space-y-2 max-w-sm">
@@ -63,23 +63,23 @@ function ToastContainer({ toasts, onRemove }: { toasts: Toast[]; onRemove: (id: 
         <ToastItem key={toast.id} toast={toast} onRemove={onRemove} />
       ))}
     </div>
-  )
+  );
 }
 
 function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) => void }) {
-  const [isVisible, setIsVisible] = useState(false)
-  const [isLeaving, setIsLeaving] = useState(false)
+  const [isVisible, setIsVisible] = useState(false);
+  const [isLeaving, setIsLeaving] = useState(false);
 
   useEffect(() => {
     // Trigger enter animation
-    const timer = setTimeout(() => setIsVisible(true), 10)
-    return () => clearTimeout(timer)
-  }, [])
+    const timer = setTimeout(() => setIsVisible(true), 10);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleClose = () => {
-    setIsLeaving(true)
-    setTimeout(() => onRemove(toast.id), 150)
-  }
+    setIsLeaving(true);
+    setTimeout(() => onRemove(toast.id), 150);
+  };
 
   const getIcon = () => {
     switch (toast.type) {
@@ -88,32 +88,32 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
           <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
-        )
+        );
       case 'error':
         return (
           <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
-        )
+        );
       case 'info':
         return (
           <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-        )
+        );
     }
-  }
+  };
 
   const getBgColor = () => {
     switch (toast.type) {
       case 'success':
-        return 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+        return 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800';
       case 'error':
-        return 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+        return 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800';
       case 'info':
-        return 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
+        return 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800';
     }
-  }
+  };
 
   return (
     <div
@@ -148,5 +148,5 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
         </button>
       </div>
     </div>
-  )
+  );
 }

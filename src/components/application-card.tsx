@@ -1,8 +1,8 @@
-'use client'
+'use client';
 
-import { useRouter } from 'next/navigation'
-import { ApplicationWithHealth } from '@/types/application'
-import ContextMenu from './ui/context-menu'
+import { useRouter } from 'next/navigation';
+import { ApplicationWithHealth } from '@/types/application';
+import ContextMenu from './ui/context-menu';
 
 interface ApplicationCardProps {
   application: ApplicationWithHealth
@@ -10,21 +10,21 @@ interface ApplicationCardProps {
 }
 
 export default function ApplicationCard({ application, onDelete }: ApplicationCardProps) {
-  const router = useRouter()
+  const router = useRouter();
 
   const handleCardClick = (e: React.MouseEvent) => {
-    e.preventDefault()
-    router.push(`/applications/${application.id}`)
-  }
+    e.preventDefault();
+    router.push(`/applications/${application.id}`);
+  };
 
   const handleDelete = () => {
-    onDelete?.(application.id)
-  }
+    onDelete?.(application.id);
+  };
 
   const truncateText = (text: string, maxLength: number) => {
-    if (text.length <= maxLength) return text
-    return text.substring(0, maxLength) + '...'
-  }
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+  };
 
   return (
     <div className="relative">
@@ -75,5 +75,5 @@ export default function ApplicationCard({ application, onDelete }: ApplicationCa
       </div>
 
     </div>
-  )
+  );
 }

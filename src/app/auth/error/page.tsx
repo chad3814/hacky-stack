@@ -1,11 +1,11 @@
-'use client'
+'use client';
 
-import { useSearchParams } from 'next/navigation'
-import Link from 'next/link'
+import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 
 export default function AuthError() {
-  const searchParams = useSearchParams()
-  const error = searchParams.get('error')
+  const searchParams = useSearchParams();
+  const error = searchParams.get('error');
 
   const getErrorMessage = (error: string | null) => {
     switch (error) {
@@ -13,21 +13,21 @@ export default function AuthError() {
         return {
           title: 'Access Denied',
           message: 'Your email address is not authorized to access this application. Access is restricted to authorized users.'
-        }
+        };
       case 'Configuration':
         return {
           title: 'Configuration Error',
           message: 'There is a problem with the server configuration. Please contact the administrator.'
-        }
+        };
       default:
         return {
           title: 'Authentication Error',
           message: 'An error occurred during authentication. Please try again.'
-        }
+        };
     }
-  }
+  };
 
-  const { title, message } = getErrorMessage(error)
+  const { title, message } = getErrorMessage(error);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -56,5 +56,5 @@ export default function AuthError() {
         </div>
       </div>
     </div>
-  )
+  );
 }

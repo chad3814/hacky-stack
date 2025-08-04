@@ -1,12 +1,12 @@
-'use client'
+'use client';
 
-import { useState, useEffect, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
-import { Application } from '@/types/application'
-import { useApplications } from '@/hooks/use-applications'
-import EditableText from './ui/editable-text'
-import EditableTextarea from './ui/editable-textarea'
-import Button from './ui/button'
+import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import { Application } from '@/types/application';
+import { useApplications } from '@/hooks/use-applications';
+import EditableText from './ui/editable-text';
+import EditableTextarea from './ui/editable-textarea';
+import Button from './ui/button';
 
 interface ApplicationDetailsModalProps {
   applicationId: string
@@ -19,77 +19,77 @@ export default function ApplicationDetailsModal({
   isOpen,
   onClose
 }: ApplicationDetailsModalProps) {
-  const router = useRouter()
-  const { updateApplication } = useApplications()
-  const [application, setApplication] = useState<Application | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const router = useRouter();
+  const { updateApplication } = useApplications();
+  const [application, setApplication] = useState<Application | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchApplication = useCallback(async () => {
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
       
-      const response = await fetch(`/api/applications/${applicationId}`)
+      const response = await fetch(`/api/applications/${applicationId}`);
       if (!response.ok) {
-        throw new Error('Failed to fetch application')
+        throw new Error('Failed to fetch application');
       }
       
-      const data = await response.json()
-      setApplication(data)
+      const data = await response.json();
+      setApplication(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load application')
+      setError(err instanceof Error ? err.message : 'Failed to load application');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [applicationId])
+  }, [applicationId]);
 
   useEffect(() => {
     if (isOpen && applicationId) {
-      fetchApplication()
+      fetchApplication();
     }
-  }, [isOpen, applicationId, fetchApplication])
+  }, [isOpen, applicationId, fetchApplication]);
 
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden'
+      document.body.style.overflow = 'hidden';
     } else {
-      document.body.style.overflow = 'unset'
+      document.body.style.overflow = 'unset';
     }
 
     return () => {
-      document.body.style.overflow = 'unset'
-    }
-  }, [isOpen])
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
 
   const handleUpdateName = async (newName: string) => {
-    if (!application) return
+    if (!application) return;
     
-    const updated = await updateApplication(application.id, { name: newName })
-    setApplication(updated)
-  }
+    const updated = await updateApplication(application.id, { name: newName });
+    setApplication(updated);
+  };
 
   const handleUpdateDescription = async (newDescription: string) => {
-    if (!application) return
+    if (!application) return;
     
     const updated = await updateApplication(application.id, { 
       description: newDescription || null 
-    })
-    setApplication(updated)
-  }
+    });
+    setApplication(updated);
+  };
 
   const handleClose = () => {
-    onClose()
-    router.push('/')
-  }
+    onClose();
+    router.push('/');
+  };
 
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
-      handleClose()
+      handleClose();
     }
-  }
+  };
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
     <div
@@ -229,5 +229,5 @@ export default function ApplicationDetailsModal({
         </div>
       </div>
     </div>
-  )
+  );
 }

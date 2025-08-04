@@ -1,8 +1,8 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import Modal from './ui/modal'
-import Button from './ui/button'
+import { useState } from 'react';
+import Modal from './ui/modal';
+import Button from './ui/button';
 
 interface DeleteConfirmationModalProps {
   isOpen: boolean
@@ -23,33 +23,33 @@ export default function DeleteConfirmationModal({
   itemName,
   confirmText = 'Delete'
 }: DeleteConfirmationModalProps) {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleConfirm = async () => {
-    setLoading(true)
-    setError(null)
+    setLoading(true);
+    setError(null);
 
     try {
-      await onConfirm()
-      onClose()
+      await onConfirm();
+      onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleClose = () => {
     if (!loading) {
-      setError(null)
-      onClose()
+      setError(null);
+      onClose();
     }
-  }
+  };
 
   const defaultMessage = itemName
     ? `Are you sure you want to delete "${itemName}"? This action cannot be undone.`
-    : 'Are you sure you want to delete this item? This action cannot be undone.'
+    : 'Are you sure you want to delete this item? This action cannot be undone.';
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} className="max-w-md">
@@ -107,5 +107,5 @@ export default function DeleteConfirmationModal({
         </div>
       </div>
     </Modal>
-  )
+  );
 }

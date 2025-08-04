@@ -19,5 +19,5 @@ export default function SkeletonCard() {
       {/* Footer */}
       <div className="h-3 bg-slate-300 dark:bg-slate-600 rounded w-1/3" />
     </div>
-  )
+  );
 }

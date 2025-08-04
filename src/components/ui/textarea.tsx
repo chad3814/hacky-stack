@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { TextareaHTMLAttributes, forwardRef, useEffect, useRef, useCallback } from 'react'
+import { TextareaHTMLAttributes, forwardRef, useEffect, useRef, useCallback } from 'react';
 
 interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string
@@ -11,28 +11,28 @@ interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
 
 const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ label, error, required, autoResize = false, className = '', ...props }, ref) => {
-    const textareaRef = useRef<HTMLTextAreaElement>(null)
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
     const combinedRef = (node: HTMLTextAreaElement | null) => {
       if (node) {
-        textareaRef.current = node
+        textareaRef.current = node;
       }
       if (typeof ref === 'function') {
-        ref(node)
+        ref(node);
       } else if (ref) {
-        ref.current = node
+        ref.current = node;
       }
-    }
+    };
 
     const adjustHeight = useCallback(() => {
       if (autoResize && textareaRef.current) {
-        textareaRef.current.style.height = 'auto'
-        textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`
+        textareaRef.current.style.height = 'auto';
+        textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
       }
-    }, [autoResize])
+    }, [autoResize]);
 
     useEffect(() => {
-      adjustHeight()
-    }, [props.value, adjustHeight])
+      adjustHeight();
+    }, [props.value, adjustHeight]);
 
     const textareaClasses = `
       w-full px-3 py-2 border rounded-md shadow-sm transition-colors resize-none
@@ -46,7 +46,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       placeholder-slate-400 dark:placeholder-slate-500
       disabled:opacity-50 disabled:cursor-not-allowed
       ${className}
-    `.trim()
+    `.trim();
 
     return (
       <div className="space-y-1">
@@ -68,10 +68,10 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           </p>
         )}
       </div>
-    )
+    );
   }
-)
+);
 
-Textarea.displayName = 'Textarea'
+Textarea.displayName = 'Textarea';
 
-export default Textarea
+export default Textarea;

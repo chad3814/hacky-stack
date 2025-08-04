@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react';
 
 interface EditableTextProps {
   value: string
@@ -19,77 +19,77 @@ export default function EditableText({
   multiline = false,
   disabled = false
 }: EditableTextProps) {
-  const [isEditing, setIsEditing] = useState(false)
-  const [editValue, setEditValue] = useState(value)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null)
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState(value);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    setEditValue(value)
-  }, [value])
+    setEditValue(value);
+  }, [value]);
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
-      inputRef.current.focus()
+      inputRef.current.focus();
       if (!multiline) {
-        ;(inputRef.current as HTMLInputElement).select()
+        ;(inputRef.current as HTMLInputElement).select();
       }
     }
-  }, [isEditing, multiline])
+  }, [isEditing, multiline]);
 
   const handleStartEdit = () => {
     if (!disabled) {
-      setIsEditing(true)
-      setError(null)
+      setIsEditing(true);
+      setError(null);
     }
-  }
+  };
 
   const handleCancel = () => {
-    setIsEditing(false)
-    setEditValue(value)
-    setError(null)
-  }
+    setIsEditing(false);
+    setEditValue(value);
+    setError(null);
+  };
 
   const handleSave = async () => {
     if (editValue.trim() === value.trim()) {
-      setIsEditing(false)
-      return
+      setIsEditing(false);
+      return;
     }
 
-    setLoading(true)
-    setError(null)
+    setLoading(true);
+    setError(null);
 
     try {
-      await onSave(editValue.trim())
-      setIsEditing(false)
+      await onSave(editValue.trim());
+      setIsEditing(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save')
+      setError(err instanceof Error ? err.message : 'Failed to save');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !multiline) {
-      e.preventDefault()
-      handleSave()
+      e.preventDefault();
+      handleSave();
     } else if (e.key === 'Enter' && multiline && (e.ctrlKey || e.metaKey)) {
-      e.preventDefault()
-      handleSave()
+      e.preventDefault();
+      handleSave();
     } else if (e.key === 'Escape') {
-      handleCancel()
+      handleCancel();
     }
-  }
+  };
 
   const handleBlur = () => {
     if (!loading) {
-      handleSave()
+      handleSave();
     }
-  }
+  };
 
   if (isEditing) {
-    const InputComponent = multiline ? 'textarea' : 'input'
+    const InputComponent = multiline ? 'textarea' : 'input';
     return (
       <div className="space-y-1">
         <InputComponent
@@ -113,7 +113,7 @@ export default function EditableText({
           </p>
         )}
       </div>
-    )
+    );
   }
 
   return (
@@ -129,5 +129,5 @@ export default function EditableText({
         </span>
       )}
     </div>
-  )
+  );
 }

@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react';
 
 interface ContextMenuProps {
   children: React.ReactNode
@@ -14,9 +14,9 @@ interface ContextMenuProps {
 }
 
 export default function ContextMenu({ children, items, className = '' }: ContextMenuProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const menuRef = useRef<HTMLDivElement>(null)
-  const triggerRef = useRef<HTMLDivElement>(null)
+  const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -25,45 +25,45 @@ export default function ContextMenu({ children, items, className = '' }: Context
         !menuRef.current.contains(event.target as Node) &&
         !triggerRef.current?.contains(event.target as Node)
       ) {
-        setIsOpen(false)
+        setIsOpen(false);
       }
-    }
+    };
 
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        setIsOpen(false)
+        setIsOpen(false);
       }
-    }
+    };
 
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
-      document.addEventListener('keydown', handleEscape)
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleEscape);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-      document.removeEventListener('keydown', handleEscape)
-    }
-  }, [isOpen])
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isOpen]);
 
   const handleTriggerClick = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    setIsOpen(!isOpen)
-  }
+    e.stopPropagation();
+    setIsOpen(!isOpen);
+  };
 
   const handleItemClick = (item: typeof items[0]) => {
     if (!item.disabled) {
-      item.onClick()
-      setIsOpen(false)
+      item.onClick();
+      setIsOpen(false);
     }
-  }
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent, item: typeof items[0]) => {
     if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault()
-      handleItemClick(item)
+      e.preventDefault();
+      handleItemClick(item);
     }
-  }
+  };
 
   return (
     <div className={`relative ${className}`}>
@@ -110,5 +110,5 @@ export default function ContextMenu({ children, items, className = '' }: Context
         </>
       )}
     </div>
-  )
+  );
 }

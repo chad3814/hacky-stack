@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { InputHTMLAttributes, forwardRef } from 'react'
+import { InputHTMLAttributes, forwardRef } from 'react';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string
@@ -22,7 +22,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       placeholder-slate-400 dark:placeholder-slate-500
       disabled:opacity-50 disabled:cursor-not-allowed
       ${className}
-    `.trim()
+    `.trim();
 
     return (
       <div className="space-y-1">
@@ -43,10 +43,10 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           </p>
         )}
       </div>
-    )
+    );
   }
-)
+);
 
-Input.displayName = 'Input'
+Input.displayName = 'Input';
 
-export default Input
+export default Input;

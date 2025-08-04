@@ -1,10 +1,10 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import Modal from './ui/modal'
-import Button from './ui/button'
-import Input from './ui/input'
-import Textarea from './ui/textarea'
+import { useState, useEffect } from 'react';
+import Modal from './ui/modal';
+import Button from './ui/button';
+import Input from './ui/input';
+import Textarea from './ui/textarea';
 
 interface CreateApplicationModalProps {
   isOpen: boolean
@@ -13,49 +13,49 @@ interface CreateApplicationModalProps {
 }
 
 export default function CreateApplicationModal({ isOpen, onClose, onSubmit }: CreateApplicationModalProps) {
-  const [name, setName] = useState('')
-  const [description, setDescription] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   // Reset form when modal opens/closes
   useEffect(() => {
     if (isOpen) {
-      setName('')
-      setDescription('')
-      setError('')
+      setName('');
+      setDescription('');
+      setError('');
     }
-  }, [isOpen])
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     
     if (!name.trim()) {
-      setError('Application name is required')
-      return
+      setError('Application name is required');
+      return;
     }
 
-    setLoading(true)
-    setError('')
+    setLoading(true);
+    setError('');
 
     try {
       await onSubmit({
         name: name.trim(),
         description: description.trim() || undefined,
-      })
-      onClose()
+      });
+      onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create application')
+      setError(err instanceof Error ? err.message : 'Failed to create application');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleCancel = () => {
     if (!loading) {
-      onClose()
+      onClose();
     }
-  }
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={handleCancel} title="Create New Application">
@@ -104,5 +104,5 @@ export default function CreateApplicationModal({ isOpen, onClose, onSubmit }: Cr
         </div>
       </form>
     </Modal>
-  )
+  );
 }

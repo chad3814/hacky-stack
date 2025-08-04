@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import EditableText from './editable-text'
+import EditableText from './editable-text';
 
 interface EditableTextareaProps {
   value: string
@@ -11,5 +11,5 @@ interface EditableTextareaProps {
 }
 
 export default function EditableTextarea(props: EditableTextareaProps) {
-  return <EditableText {...props} multiline />
+  return <EditableText {...props} multiline />;
 }

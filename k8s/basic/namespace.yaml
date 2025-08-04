@@ -1,0 +1,11 @@
+# Namespace for Hacky Stack application
+# This creates an isolated environment within the Kubernetes cluster
+# for all our application resources
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hackystack
+  labels:
+    app: hackystack
+    environment: local
+    purpose: learning

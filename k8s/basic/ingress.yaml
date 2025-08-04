@@ -1,0 +1,37 @@
+# Ingress for Hacky Stack application
+# This exposes the application to external traffic via hackystack.local
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hackystack-ingress
+  namespace: hackystack
+  labels:
+    app: hackystack
+    component: ingress
+  annotations:
+    # Use nginx ingress controller
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    # Enable SSL redirect for HTTPS
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # Proxy configuration for Next.js
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+spec:
+  # TLS configuration for HTTPS
+  tls:
+  - hosts:
+    - hackystack.local
+    secretName: hackystack-tls
+  rules:
+  - host: hackystack.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: hackystack-service
+            port:
+              number: 3000

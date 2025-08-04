@@ -1,0 +1,20 @@
+# ConfigMap for non-sensitive configuration
+# This stores environment variables that are not secret
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hackystack-config
+  namespace: hackystack
+  labels:
+    app: hackystack
+    component: config
+data:
+  # Node.js environment
+  NODE_ENV: "production"
+  
+  # Application URL - will be accessible via ingress
+  NEXTAUTH_URL: "https://hackystack.local"
+  
+  # Port configuration
+  PORT: "3000"
+  HOSTNAME: "0.0.0.0"

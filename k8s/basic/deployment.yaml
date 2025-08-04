@@ -1,0 +1,74 @@
+# Deployment for Hacky Stack Next.js application
+# This defines how the application should be deployed and managed
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hackystack-app
+  namespace: hackystack
+  labels:
+    app: hackystack
+    component: app
+spec:
+  # Run 2 replicas for basic high availability
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hackystack
+      component: app
+  template:
+    metadata:
+      labels:
+        app: hackystack
+        component: app
+    spec:
+      # Security context - run as non-root user
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        fsGroup: 1001
+      containers:
+      - name: hackystack-app
+        # Using the existing Dockerfile - will need to be built and tagged
+        image: hackystack:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3000
+          name: http
+        # Resource limits and requests
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        # Environment variables from ConfigMap and Secret
+        envFrom:
+        - configMapRef:
+            name: hackystack-config
+        - secretRef:
+            name: hackystack-secrets
+        # Health check probes using existing health check endpoint
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        # Security context for the container
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false  # Next.js needs write access for optimization
+          capabilities:
+            drop:
+            - ALL

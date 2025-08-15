@@ -3,12 +3,17 @@ import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { ApplicationRole } from '@prisma/client';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const searchParams = request.nextUrl.searchParams;
+    const page = parseInt(searchParams.get('page') || '1', 10);
+    const limit = parseInt(searchParams.get('limit') || '10', 10);
+    const skip = (page - 1) * limit;
 
     const applications = await prisma.application.findMany({
       where: {
@@ -38,6 +43,8 @@ export async function GET() {
       orderBy: {
         updatedAt: 'desc',
       },
+      skip,
+      take: limit,
     });
 
     const formattedApplications = applications.map((app) => ({
@@ -50,7 +57,7 @@ export async function GET() {
       counts: app._count,
     }));
 
-    return NextResponse.json(formattedApplications);
+    return NextResponse.json({ applications: formattedApplications });
   } catch (error) {
     console.error('Error fetching applications:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

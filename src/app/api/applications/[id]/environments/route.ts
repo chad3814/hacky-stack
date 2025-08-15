@@ -83,6 +83,32 @@ export async function POST(
       return NextResponse.json({ error: 'Name is required' }, { status: 400 });
     }
 
+    // Validate name format: only lowercase letters, numbers, hyphens, and underscores
+    const nameRegex = /^[a-z0-9_-]+$/;
+    if (!nameRegex.test(name)) {
+      return NextResponse.json({ 
+        error: 'Name can only contain lowercase letters, numbers, hyphens, and underscores' 
+      }, { status: 400 });
+    }
+
+    // Validate name length
+    if (name.length > 15) {
+      return NextResponse.json({ 
+        error: 'Name must be 15 characters or less' 
+      }, { status: 400 });
+    }
+
+    // Check environment limit (max 10 per application)
+    const environmentCount = await prisma.environment.count({
+      where: { applicationId }
+    });
+
+    if (environmentCount >= 10) {
+      return NextResponse.json({ 
+        error: 'Maximum of 10 environments per application' 
+      }, { status: 400 });
+    }
+
     const environment = await prisma.environment.create({
       data: {
         name,

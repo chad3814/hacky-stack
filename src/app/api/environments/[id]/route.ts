@@ -85,24 +85,24 @@ export async function PUT(
     }
 
     const { id } = await params;
-    const { role } = await getUserRole(id, session.user.id);
+    const { environment, role } = await getUserRole(id, session.user.id);
+
+    if (!environment) {
+      return NextResponse.json({ error: 'Environment not found' }, { status: 404 });
+    }
 
     if (!role || (role !== ApplicationRole.OWNER && role !== ApplicationRole.EDITOR)) {
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
     }
 
     const body = await request.json();
-    const { name, description } = body;
+    const { description } = body;
 
-    if (name && typeof name !== 'string') {
-      return NextResponse.json({ error: 'Invalid name' }, { status: 400 });
-    }
-
-    const environment = await prisma.environment.update({
+    // Only description can be updated, name is immutable
+    const updatedEnvironment = await prisma.environment.update({
       where: { id },
       data: {
-        ...(name && { name }),
-        ...(description !== undefined && { description }),
+        description: description ?? null,
       },
       include: {
         _count: {
@@ -114,11 +114,8 @@ export async function PUT(
       },
     });
 
-    return NextResponse.json(environment);
+    return NextResponse.json(updatedEnvironment);
   } catch (error) {
-    if (error instanceof Error && error.message.includes('Unique constraint')) {
-      return NextResponse.json({ error: 'Environment name already exists' }, { status: 409 });
-    }
     console.error('Error updating environment:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
@@ -135,17 +132,41 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    const { role } = await getUserRole(id, session.user.id);
+    const { environment, role } = await getUserRole(id, session.user.id);
+
+    if (!environment) {
+      return NextResponse.json({ error: 'Environment not found' }, { status: 404 });
+    }
 
     if (!role || (role !== ApplicationRole.OWNER && role !== ApplicationRole.EDITOR)) {
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
+    }
+
+    // Check if environment has attached resources
+    const resourceCounts = await prisma.environment.findUnique({
+      where: { id },
+      select: {
+        _count: {
+          select: {
+            secrets: true,
+            variables: true,
+          },
+        },
+      },
+    });
+
+    if (resourceCounts?._count.secrets || resourceCounts?._count.variables) {
+      const totalResources = (resourceCounts._count.secrets || 0) + (resourceCounts._count.variables || 0);
+      return NextResponse.json({ 
+        error: `Cannot delete environment with attached resources (${resourceCounts._count.secrets} secrets, ${resourceCounts._count.variables} variables)` 
+      }, { status: 409 });
     }
 
     await prisma.environment.delete({
       where: { id },
     });
 
-    return NextResponse.json({ message: 'Environment deleted successfully' });
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error deleting environment:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

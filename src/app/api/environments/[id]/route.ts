@@ -156,7 +156,6 @@ export async function DELETE(
     });
 
     if (resourceCounts?._count.secrets || resourceCounts?._count.variables) {
-      const totalResources = (resourceCounts._count.secrets || 0) + (resourceCounts._count.variables || 0);
       return NextResponse.json({ 
         error: `Cannot delete environment with attached resources (${resourceCounts._count.secrets} secrets, ${resourceCounts._count.variables} variables)` 
       }, { status: 409 });

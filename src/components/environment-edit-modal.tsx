@@ -44,7 +44,7 @@ export default function EnvironmentEditModal({
         description: description || null
       });
       onClose();
-    } catch (err) {
+    } catch {
       // Error is already handled by the hook with toast
     } finally {
       setLoading(false);
